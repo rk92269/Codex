@@ -1,49 +1,86 @@
 import React from "react";
 
-function TaskList({ tasks, onEdit, onDelete, onToggleComplete }) {
+function formatDate(dateValue) {
+  if (!dateValue) {
+    return "Just now";
+  }
+
+  return new Date(dateValue).toLocaleDateString();
+}
+
+function TaskList({ tasks, isLoading, onEdit, onDelete, onToggleComplete }) {
+  if (isLoading) {
+    return <p className="empty-state">Loading tasks...</p>;
+  }
+
   if (tasks.length === 0) {
-    return <p>No tasks found. Add your first task.</p>;
+    return (
+      <div className="empty-state">
+        <h3>No tasks found</h3>
+        <p>Add your first task to start organizing customer work.</p>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h2>Task List</h2>
+    <div className="table-wrap">
+      <table className="task-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      {tasks.map((task) => (
-        <div
-          key={task._id}
-          style={{
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            padding: "12px",
-            marginBottom: "10px",
-            backgroundColor: "#fff"
-          }}
-        >
-          <h3>{task.title}</h3>
-          <p>{task.description || "No description"}</p>
-          <p>
-            <strong>Status:</strong> {task.completed ? "Completed" : "Pending"}
-          </p>
-
-          <label style={{ display: "block", marginBottom: "10px" }}>
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => onToggleComplete(task)}
-            />{" "}
-            Mark as completed
-          </label>
-
-          <button onClick={() => onEdit(task)}>Edit</button>
-          <button
-            onClick={() => onDelete(task._id)}
-            style={{ marginLeft: "10px" }}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+        <tbody>
+          {tasks.map((task) => (
+            <tr key={task._id}>
+              <td>
+                <div className="task-title-cell">
+                  <strong>{task.title}</strong>
+                </div>
+              </td>
+              <td>{task.description || "No description provided"}</td>
+              <td>
+                <label className="status-toggle">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => onToggleComplete(task)}
+                  />
+                  <span
+                    className={
+                      task.completed ? "status-badge done" : "status-badge pending"
+                    }
+                  >
+                    {task.completed ? "Completed" : "Pending"}
+                  </span>
+                </label>
+              </td>
+              <td>{formatDate(task.updatedAt)}</td>
+              <td>
+                <div className="action-group">
+                  <button
+                    className="action-button action-edit"
+                    onClick={() => onEdit(task)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="action-button action-delete"
+                    onClick={() => onDelete(task._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

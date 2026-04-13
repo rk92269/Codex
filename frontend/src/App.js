@@ -6,6 +6,8 @@ import api from "./services/api";
 function App() {
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load tasks when the page opens
   useEffect(() => {
@@ -14,10 +16,13 @@ function App() {
 
   const fetchTasks = async () => {
     try {
+      setIsLoading(true);
       const response = await api.get("/tasks");
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,26 +78,100 @@ function App() {
     }
   };
 
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter((task) => task.completed).length;
+  const pendingTasks = totalTasks - completedTasks;
+
+  const filteredTasks = tasks.filter((task) => {
+    if (statusFilter === "completed") {
+      return task.completed;
+    }
+
+    if (statusFilter === "pending") {
+      return !task.completed;
+    }
+
+    return true;
+  });
+
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-      <h1>Task Manager</h1>
-      <p>Manage your tasks with a simple full-stack CRUD app.</p>
+    <main className="app-shell">
+      <section className="hero-panel">
+        <div>
+          <p className="eyebrow">Customer Task Workspace</p>
+          <h1>Task Manager Dashboard</h1>
+          <p className="hero-text">
+            Track requests, update progress, and keep your team aligned with a
+            clean task workflow.
+          </p>
+        </div>
 
-      <TaskForm
-        onSubmit={handleAddOrUpdateTask}
-        editingTask={editingTask}
-        onCancelEdit={handleCancelEdit}
-      />
+        <div className="hero-badge">
+          <span>Live Overview</span>
+          <strong>{totalTasks} Tasks</strong>
+        </div>
+      </section>
 
-      <hr style={{ margin: "20px 0" }} />
+      <section className="summary-grid">
+        <article className="summary-card">
+          <span>Total Tasks</span>
+          <strong>{totalTasks}</strong>
+          <p>All task records currently in your workspace.</p>
+        </article>
 
-      <TaskList
-        tasks={tasks}
-        onEdit={handleEditTask}
-        onDelete={handleDeleteTask}
-        onToggleComplete={handleToggleComplete}
-      />
-    </div>
+        <article className="summary-card">
+          <span>Pending</span>
+          <strong>{pendingTasks}</strong>
+          <p>Tasks that still need follow-up or delivery.</p>
+        </article>
+
+        <article className="summary-card">
+          <span>Completed</span>
+          <strong>{completedTasks}</strong>
+          <p>Finished work ready for review or archive.</p>
+        </article>
+      </section>
+
+      <section className="content-grid">
+        <div className="panel">
+          <TaskForm
+            onSubmit={handleAddOrUpdateTask}
+            editingTask={editingTask}
+            onCancelEdit={handleCancelEdit}
+          />
+        </div>
+
+        <div className="panel">
+          <div className="panel-header">
+            <div>
+              <h2>Task List</h2>
+              <p>Review tasks in a table and manage them quickly.</p>
+            </div>
+
+            <label className="filter-group" htmlFor="statusFilter">
+              <span>Filter</span>
+              <select
+                id="statusFilter"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
+          </div>
+
+          <TaskList
+            tasks={filteredTasks}
+            isLoading={isLoading}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+            onToggleComplete={handleToggleComplete}
+          />
+        </div>
+      </section>
+    </main>
   );
 }
 

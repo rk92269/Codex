@@ -34,12 +34,20 @@ function TaskForm({ onSubmit, editingTask, onCancelEdit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{editingTask ? "Edit Task" : "Add New Task"}</h2>
+    <form className="task-form" onSubmit={handleSubmit}>
+      <div className="panel-header">
+        <div>
+          <h2>{editingTask ? "Edit Task" : "Add New Task"}</h2>
+          <p>
+            {editingTask
+              ? "Update task details and save your changes."
+              : "Capture new work items with a clear title and description."}
+          </p>
+        </div>
+      </div>
 
-      <div>
+      <div className="field-group">
         <label htmlFor="title">Title</label>
-        <br />
         <input
           id="title"
           type="text"
@@ -49,28 +57,27 @@ function TaskForm({ onSubmit, editingTask, onCancelEdit }) {
         />
       </div>
 
-      <div style={{ marginTop: "10px" }}>
+      <div className="field-group">
         <label htmlFor="description">Description</label>
-        <br />
         <textarea
           id="description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           placeholder="Enter task description"
-          rows="4"
+          rows="5"
         />
       </div>
 
-      <div style={{ marginTop: "10px" }}>
-        <button type="submit">
+      <div className="form-actions">
+        <button className="primary-button" type="submit">
           {editingTask ? "Update Task" : "Add Task"}
         </button>
 
         {editingTask && (
           <button
+            className="secondary-button"
             type="button"
             onClick={onCancelEdit}
-            style={{ marginLeft: "10px" }}
           >
             Cancel
           </button>
