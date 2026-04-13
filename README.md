@@ -88,12 +88,43 @@ The frontend runs on:
 http://localhost:3000
 ```
 
+## Run with Docker
+
+Build and start all services:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+
+- frontend on `http://localhost:3000`
+- backend API on `http://localhost:5000`
+- MongoDB on port `27017`
+
+Note:
+
+- the frontend Docker image receives its API URL during the image build
+- in this project, `docker-compose.yml` passes `REACT_APP_API_URL` as a Docker build argument
+
+To stop the containers:
+
+```bash
+docker compose down
+```
+
 ## Manual API Testing with curl
 
 Test the root route:
 
 ```bash
 curl http://localhost:5000/
+```
+
+Test the health route:
+
+```bash
+curl http://localhost:5000/health
 ```
 
 Get all tasks:
@@ -159,3 +190,6 @@ This project is set up to be Docker-friendly later because:
 - environment variables are used for configuration
 - the backend does not hardcode database settings in code
 - the frontend API URL can be changed through `.env`
+- Dockerfiles exist for both backend and frontend
+- `docker-compose.yml` runs frontend, backend, and MongoDB together
+- health checks are included for MongoDB and the backend
