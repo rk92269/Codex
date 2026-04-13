@@ -1,0 +1,12 @@
+_format_version: "3.0"
+
+services:
+  - name: task-manager-lb
+    url: http://nginx:80
+    routes:
+      - name: task-manager-api
+        paths:
+          - /api
+          - /health
+          - /
+        strip_path: false

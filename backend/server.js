@@ -13,6 +13,7 @@ const app = express();
 
 // Choose a port from the environment, or use 5000 by default
 const PORT = process.env.PORT || 5000;
+const APP_INSTANCE = process.env.APP_INSTANCE || "backend";
 
 // Connect to MongoDB
 connectDB();
@@ -23,12 +24,18 @@ app.use(express.json());
 
 // Simple test route so we can confirm the server is working
 app.get("/", (req, res) => {
-  res.json({ message: "Task Manager API is running" });
+  res.json({
+    message: "Task Manager API is running",
+    instance: APP_INSTANCE
+  });
 });
 
 // Health route for quick checks and Docker-friendly monitoring
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    instance: APP_INSTANCE
+  });
 });
 
 // Task API routes
